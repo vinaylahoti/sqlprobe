@@ -51,3 +51,41 @@ class ExecutionResult:
     error: str | None
     duration_ms: float
     failure_mode: FailureMode | None
+
+
+@dataclass
+class DimensionResult:
+    dimension: str
+    verdict: str
+    failure_mode: FailureMode | None
+    evidence: str
+    confidence: str
+
+
+@dataclass
+class JudgeResult:
+    overall_verdict: str
+    overall_score: float
+    confidence: str
+    dimensions: list[DimensionResult]
+    model: str
+    skipped: bool = False
+
+
+def compute_overall_score(dimensions: list[DimensionResult]) -> float:
+    """Fraction of non-SKIP dimensions that returned PASS."""
+    countable = [d for d in dimensions if d.verdict != "SKIP"]
+    if not countable:
+        return 1.0
+    passed = [d for d in countable if d.verdict == "PASS"]
+    return round(len(passed) / len(countable), 4)
+
+
+def compute_overall_verdict(dimensions: list[DimensionResult]) -> str:
+    """FAIL if any FAIL, WARN if any WARN and no FAIL, else PASS."""
+    verdicts = {d.verdict for d in dimensions}
+    if "FAIL" in verdicts:
+        return "FAIL"
+    if "WARN" in verdicts:
+        return "WARN"
+    return "PASS"

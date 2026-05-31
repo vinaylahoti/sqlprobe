@@ -27,6 +27,14 @@
 
 ---
 
+## Phase 3 Status
+
+- [x] DimensionResult and JudgeResult added to core/result.py
+- [x] compute_overall_score and compute_overall_verdict helpers added
+- [x] anthropic added to judge extra and dev dependencies
+
+---
+
 ## What Exists Today
 
 ### Repository Structure
