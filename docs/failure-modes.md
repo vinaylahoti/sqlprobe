@@ -42,23 +42,25 @@ Failure modes are SQLProbe's structured labels for correctness risks in generate
 
 ## Which Failure Modes Are Currently Detected
 
-| Code | v0.0.2 | How detected |
+v0.0.2 = deterministic only. v0.0.3 adds LLM judge (requires `--judge` flag and `ANTHROPIC_API_KEY`).
+
+| Code | v0.0.3 | How detected |
 |---|---|---|
 | `DIALECT_MISMATCH` | ✅ | `sqlglot` syntax evaluation for parse failures, empty SQL, and unsupported dialects |
 | `NONEXISTENT_OBJECT` | 🔲 | Planned schema validation or database-object checks; current execution errors are reported as `TYPE_MISMATCH_COERCION` |
 | `CARDINALITY_EXPLOSION` | ✅ | DuckDB adapter row count threshold |
 | `SILENT_EMPTY` | ✅ | Execution evaluator row count check when expected rows are greater than zero |
 | `TYPE_MISMATCH_COERCION` | ✅ | Execution evaluator maps database execution errors to this closest existing taxonomy code |
-| `NULL_PROPAGATION` | ✅ | Execution evaluator `no_nulls_in` and `value_range` null checks |
-| `WRONG_GRAIN` | ✅ | Execution evaluator row count mismatch against `expected.result_shape.row_count` |
-| `WRONG_DATE_BOUNDARY` | ✅ | Built-in structural assertion `require_explicit_date_filter`; full boundary reasoning is planned |
-| `MISSING_FILTER` | 🔲 | Planned semantic judge and richer assertion library |
-| `SPURIOUS_FILTER` | 🔲 | Planned semantic judge |
-| `WRONG_AGGREGATION` | ✅ | Execution evaluator value-range violations; assertion engine also supports configured `aggregation_type` checks |
-| `COLUMN_SUBSTITUTION` | ✅ | Structural assertion engine and execution evaluator `columns_present` failures |
-| `DECOMPOSITION_FAILURE` | 🔲 | Planned semantic judge |
-| `METRIC_DEFINITION_VIOLATION` | 🔲 | Planned result assertions, semantic annotations, and LLM judge |
+| `NULL_PROPAGATION` | ✅ | Execution evaluator `no_nulls_in` and `value_range` null checks; result assertions can also detect null result values |
+| `WRONG_GRAIN` | ✅ | Execution evaluator row count mismatch against `expected.result_shape.row_count`; LLM judge `grain` dimension |
+| `WRONG_DATE_BOUNDARY` | ✅ | Built-in structural assertion `require_explicit_date_filter`; LLM judge `date_boundary` dimension |
+| `MISSING_FILTER` | ✅ | LLM judge `segment_filter` dimension |
+| `SPURIOUS_FILTER` | ✅ | LLM judge `segment_filter` dimension |
+| `WRONG_AGGREGATION` | ✅ | Execution evaluator value-range violations; assertion engine configured `aggregation_type` checks; result assertions; LLM judge `aggregation` dimension |
+| `COLUMN_SUBSTITUTION` | ✅ | Structural assertion engine and execution evaluator `columns_present` failures; LLM judge `metric_definition` dimension |
+| `DECOMPOSITION_FAILURE` | ✅ | LLM judge `grain` dimension |
+| `METRIC_DEFINITION_VIOLATION` | ✅ | LLM judge `metric_definition` dimension |
 | `MISSING_BUSINESS_FILTER` | ✅ | Structural assertion engine, including built-in test-account exclusion rule |
-| `CALENDAR_VIOLATION` | 🔲 | Planned fiscal calendar assertions and semantic judge |
-| `SCOPE_VIOLATION` | 🔲 | Planned scope assertions tied to case context and user role |
-| `STALE_LOGIC` | 🔲 | Planned baseline/regression and business-rule versioning |
+| `CALENDAR_VIOLATION` | ✅ | LLM judge `date_boundary` dimension |
+| `SCOPE_VIOLATION` | ✅ | LLM judge `segment_filter` dimension |
+| `STALE_LOGIC` | ✅ | LLM judge `metric_definition` dimension |

@@ -6,7 +6,7 @@
 
 ---
 
-## Current Version: v0.0.2 (in development → complete)
+## Current Version: v0.0.3
 
 ## Last Updated: 2026-05-31
 
@@ -56,7 +56,7 @@
 - [x] Package scaffold created (`sqlprobe/` with all subdirectories)
 - [x] `pyproject.toml` with correct dependencies and optional DuckDB extra
 - [x] `LICENSE` (Apache 2.0)
-- [x] `README.md` (v0.0.2 quickstart and current scope)
+- [x] `README.md` (v0.0.3 quickstart and current scope)
 - [x] `IMPLEMENTATION_PLAN.md` (v0.0.1 build plan)
 - [x] `PROJECT_STATUS.md`
 - [x] `CHANGELOG.md`
@@ -66,17 +66,18 @@
 ### Core
 - [x] `sqlprobe/core/taxonomy.py` — all 18 failure modes, Layer, Severity, FailureModeMetadata, FAILURE_MODE_REGISTRY
 - [x] `sqlprobe/core/case.py` — EvaluationCase, ExpectedOutput, ExpectedResultShape, InputContext
-- [x] `sqlprobe/core/result.py` — EvaluationResult, LayerResult, AssertionFailure, ExecutionResult
+- [x] `sqlprobe/core/result.py` — EvaluationResult, LayerResult, AssertionFailure, ExecutionResult, DimensionResult, JudgeResult
 
 ### Loaders
 - [x] `sqlprobe/loader/case_loader.py`
 - [x] `sqlprobe/loader/assertion_loader.py`
+- [x] `sqlprobe/loader/annotation_loader.py`
 
 ### Evaluators
 - [x] `sqlprobe/evaluators/syntax.py`
 - [x] `sqlprobe/evaluators/assertions.py`
 - [x] `sqlprobe/evaluators/execution.py`
-- [x] `sqlprobe/evaluators/judge.py` — skipped stub for Phase 3
+- [x] `sqlprobe/evaluators/judge.py` — Claude judge implementation, gated by `--judge`
 
 ### Adapters
 - [x] `sqlprobe/adapters/duckdb.py`
@@ -96,6 +97,10 @@
 - [x] `assertions/revenue.yaml`
 - [x] `assertions/filters.yaml`
 - [x] `assertions/date_handling.yaml`
+- [x] `assertions/churn.yaml`
+
+### Schema Annotations
+- [x] `schema/annotations.yaml`
 
 ### Example Cases (YAML)
 - [x] `cases/examples/revenue_q1_enterprise.yaml`
@@ -103,11 +108,14 @@
 
 ### Tests
 - [x] `tests/test_assertion_engine.py`
+- [x] `tests/test_annotation_loader.py`
 - [x] `tests/test_cli.py`
 - [x] `tests/test_duckdb_adapter.py`
 - [x] `tests/test_execution_evaluator.py`
 - [x] `tests/test_integration.py`
+- [x] `tests/test_judge.py`
 - [x] `tests/test_package.py`
+- [x] `tests/test_result_assertions.py`
 - [x] `tests/test_stubs.py`
 - [x] `tests/test_syntax_evaluator.py`
 
@@ -125,21 +133,21 @@
 | `sqlprobe run --sql "..."` | Implemented |
 | `sqlprobe run --db duckdb://...` | Implemented |
 | `sqlprobe run --judge` | Implemented |
-| `sqlprobe run --annotations` | Implemented |
+| `sqlprobe run --annotations schema/...` | Implemented |
 | `sqlprobe run --output report.json` | Implemented |
 | `sqlprobe demo` | Implemented |
 | `sqlprobe baseline create` | Not implemented |
 
 ---
 
-## What Does NOT Exist Yet (Phase 3 And Later)
+## What Does NOT Exist Yet (Phase 4)
 
-- LLM judge (`evaluators/judge.py`) — Anthropic Claude API, structured output
-- Result assertions (checked against execution output, e.g. `churn_rate_bounded`)
-- Baseline pinning and regression detection
-- Semantic schema annotations
+- Baseline pinning (`sqlprobe baseline create`)
+- Regression detection (`sqlprobe run --compare-baseline`)
+- CI/CD workflow (`.github/workflows/sqlprobe.yml`)
+- Judge calibration against known-correct cases
 - dbt importer
-- CI/CD workflow
+- Trace store
 - PyPI publishing
 
 ---
@@ -152,6 +160,6 @@ None yet.
 
 ## Next Up
 
-- Phase 3: LLM judge — see `SQLPROBE_PHASE2_CONTEXT.md` for Phase 3 scope
+- Phase 4: Baseline and regression — see Phase 3 context file for scope notes
 
 ---

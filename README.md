@@ -6,7 +6,7 @@ SQLProbe is an open source evaluation harness for NL-to-SQL systems. It does not
 
 ## Current Release Scope
 
-This repository is currently at `v0.0.2` in development. The implemented release includes:
+This repository is currently at `v0.0.3`. The implemented release includes:
 
 - YAML evaluation case loading
 - YAML assertion loading
@@ -14,9 +14,12 @@ This repository is currently at `v0.0.2` in development. The implemented release
 - Structural assertion checks against SQL text and AST
 - DuckDB execution adapter for local fixture databases
 - Result shape evaluation for row counts, value ranges, null checks, and column presence
+- Result assertions against actual query output
+- Optional LLM judge evaluation with Claude
+- Optional schema annotations for judge context
 - Failure mode taxonomy
-- Typer CLI with `validate`, `run`, `demo`, and `run --db`
-- JSON report output for `run`, including execution layer results
+- Typer CLI with `validate`, `run`, `demo`, `run --db`, `run --judge`, and `run --annotations`
+- JSON report output for `run`, including execution and judge results
 
 ## What's New in v0.0.2
 
@@ -26,11 +29,19 @@ This repository is currently at `v0.0.2` in development. The implemented release
 - JSON report now includes execution layer results
 - 18-failure-mode reference: see `docs/failure-modes.md`
 
+## What's New in v0.0.3
+
+- LLM judge: semantic and business dimension evaluation via Claude
+- `--judge` flag: `sqlprobe run cases/ --db duckdb://./fixtures/warehouse.db --judge`
+- `--annotations` flag: inject schema context into the judge
+- Result assertions: check conditions against actual query output
+- 11 additional failure modes now detectable (previously required human review)
+- Judge is additive: evaluation pipeline works without it
+
 The following are planned but not implemented:
 
-- LLM judge behavior
 - Baseline and regression comparison
-- Semantic schema annotations
+- Semantic schema annotation import from dbt or catalogs
 - dbt or catalog importers
 - Trace store
 - PyPI release
@@ -40,7 +51,7 @@ The following are planned but not implemented:
 - Python 3.10+
 - No database required for syntax and structural assertion checks
 - DuckDB optional extra or development install required for `--db`
-- No LLM API key required
+- No LLM API key required unless using `--judge`
 
 ## Install From Source
 
@@ -177,13 +188,15 @@ Example report:
     "case_id": "churn_rate_monthly",
     "passed": true,
     "failure_modes": [],
-    "execution": { "ran": false }
+    "execution": { "ran": false },
+    "judge": { "ran": false }
   },
   {
     "case_id": "revenue_q1_enterprise",
     "passed": true,
     "failure_modes": [],
-    "execution": { "ran": false }
+    "execution": { "ran": false },
+    "judge": { "ran": false }
   }
 ]
 ```
@@ -263,6 +276,8 @@ sqlprobe --help
 sqlprobe validate cases/examples
 sqlprobe run cases/examples
 sqlprobe run cases/examples --db duckdb://./fixtures/warehouse.db
+sqlprobe run cases/examples --judge
+sqlprobe run cases/examples --judge --annotations schema/annotations.yaml
 sqlprobe run cases/examples/revenue_q1_enterprise.yaml --sql "SELECT SUM(amount) FROM transactions t JOIN accounts a ON t.account_id = a.id WHERE a.segment = 'enterprise'"
 sqlprobe run cases/examples --output report.json
 sqlprobe run cases/examples --db duckdb://./fixtures/warehouse.db --output report.json
@@ -287,7 +302,7 @@ sqlprobe/
     syntax.py           sqlglot syntax validation
     assertions.py       structural assertion engine
     execution.py        result shape evaluation
-    judge.py            skipped stub for future LLM judging
+    judge.py            optional Claude judge; requires --judge and ANTHROPIC_API_KEY
   adapters/
     duckdb.py           DuckDB execution adapter
   regression/

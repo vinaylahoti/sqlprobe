@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "sqlprobe"
-version = "0.0.1"
+version = "0.0.3"
 description = "Production trust layer for AI-generated SQL"
 readme = "README.md"
 license = { file = "LICENSE" }
