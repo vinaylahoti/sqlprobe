@@ -42,6 +42,11 @@
 - [x] SQLProbeJudge implemented in evaluators/judge.py
 - [x] JudgeInput dataclass added
 - [x] tests/test_judge.py added and passing (all mocked, no real API calls)
+- [x] --judge flag wired in CLI
+- [x] --annotations flag wired in CLI
+- [x] execution_result passed to evaluate_assertions when --db active
+- [x] JSON report includes judge key
+- [x] CLI tests extended for judge flag
 
 ---
 
@@ -119,6 +124,8 @@
 | `sqlprobe run <cases/>` | Implemented |
 | `sqlprobe run --sql "..."` | Implemented |
 | `sqlprobe run --db duckdb://...` | Implemented |
+| `sqlprobe run --judge` | Implemented |
+| `sqlprobe run --annotations` | Implemented |
 | `sqlprobe run --output report.json` | Implemented |
 | `sqlprobe demo` | Implemented |
 | `sqlprobe baseline create` | Not implemented |

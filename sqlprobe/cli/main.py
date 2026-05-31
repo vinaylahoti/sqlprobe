@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -8,11 +9,13 @@ import typer
 from rich.console import Console
 
 from ..core.case import EvaluationCase
-from ..core.result import AssertionFailure, EvaluationResult, LayerResult
+from ..core.result import AssertionFailure, EvaluationResult, JudgeResult, LayerResult
 from ..core.taxonomy import FailureMode, Severity
 from ..evaluators.assertions import evaluate_assertions
 from ..evaluators.execution import evaluate_execution
+from ..evaluators.judge import JudgeInput, SQLProbeJudge
 from ..evaluators.syntax import evaluate_syntax
+from ..loader.annotation_loader import SchemaAnnotation, load_annotations
 from ..loader.assertion_loader import Assertion, load_assertions_from_dir
 from ..loader.case_loader import load_case, load_cases_from_dir
 
@@ -115,6 +118,30 @@ def _print_case_result(result: EvaluationResult) -> None:
         console.print(f"  Assertion: {failure.assertion_id}")
         console.print(f"  Detail: {failure.detail}")
 
+    judge_result = getattr(result, "_judge_result", None)
+    if (
+        judge_result is not None
+        and not judge_result.skipped
+        and judge_result.overall_verdict != "PASS"
+    ):
+        console.print(
+            f"  Judge verdict: {judge_result.overall_verdict} "
+            f"(score: {judge_result.overall_score}, "
+            f"confidence: {judge_result.confidence})"
+        )
+        for dimension in judge_result.dimensions:
+            if dimension.verdict == "PASS":
+                continue
+            failure_mode = (
+                dimension.failure_mode.name
+                if dimension.failure_mode is not None
+                else ""
+            )
+            console.print(
+                f"    {dimension.dimension:<20} {dimension.verdict}  {failure_mode}"
+            )
+            console.print(f"      {dimension.evidence}")
+
 
 def _write_json_report(path: Path, results: list[EvaluationResult]) -> None:
     report = [
@@ -125,6 +152,7 @@ def _write_json_report(path: Path, results: list[EvaluationResult]) -> None:
                 failure_mode.value for failure_mode in result.failure_modes
             ],
             "execution": _execution_report_entry(result),
+            "judge": _judge_report_entry(result),
         }
         for result in results
     ]
@@ -152,6 +180,34 @@ def _execution_report_entry(result: EvaluationResult) -> dict:
                 "severity": failure.severity.value,
             }
             for failure in execution.failures
+        ],
+    }
+
+
+def _judge_report_entry(result: EvaluationResult) -> dict:
+    judge_result: Optional[JudgeResult] = getattr(result, "_judge_result", None)
+    if judge_result is None:
+        return {"ran": False}
+
+    return {
+        "ran": True,
+        "skipped": judge_result.skipped,
+        "overall_verdict": judge_result.overall_verdict,
+        "overall_score": judge_result.overall_score,
+        "confidence": judge_result.confidence,
+        "dimensions": [
+            {
+                "dimension": dimension.dimension,
+                "verdict": dimension.verdict,
+                "failure_mode": (
+                    dimension.failure_mode.name
+                    if dimension.failure_mode is not None
+                    else None
+                ),
+                "evidence": dimension.evidence,
+                "confidence": dimension.confidence,
+            }
+            for dimension in judge_result.dimensions
         ],
     }
 
@@ -193,9 +249,20 @@ def _run_cases(
     output: Optional[Path] = None,
     fail_on: Optional[str] = None,
     db: Optional[str] = None,
+    judge: bool = False,
+    annotations: Optional[str] = None,
 ) -> None:
+    if judge and not os.environ.get("ANTHROPIC_API_KEY"):
+        typer.echo("Error: --judge requires ANTHROPIC_API_KEY to be set.")
+        raise typer.Exit(code=1)
+
     cases = _load_cases(path)
     assertion_registry = _load_assertions()
+    schema_annotations: list[SchemaAnnotation] = (
+        load_annotations(annotations) if annotations is not None else []
+    )
+    judge_obj = SQLProbeJudge() if judge else None
+    judge_count = 0
     results: list[EvaluationResult] = []
 
     for case in cases:
@@ -208,15 +275,6 @@ def _run_cases(
             raise typer.Exit(1)
 
         syntax_result = evaluate_syntax(generated_sql, dialect=dialect)
-        assertion_result = (
-            evaluate_assertions(
-                case=case,
-                sql=generated_sql,
-                assertion_registry=assertion_registry,
-            )
-            if syntax_result.passed
-            else LayerResult(layer=syntax_result.layer, passed=True, skipped=True)
-        )
         if db is None:
             execution_result = evaluate_execution(generated_sql)
             raw_execution_result = None
@@ -229,6 +287,41 @@ def _run_cases(
                 raw_execution_result,
                 case.expected.result_shape,
             )
+
+        if syntax_result.passed:
+            if raw_execution_result is not None and raw_execution_result.success:
+                assertion_result = evaluate_assertions(
+                    case=case,
+                    sql=generated_sql,
+                    assertion_registry=assertion_registry,
+                    execution_result=raw_execution_result,
+                )
+            else:
+                assertion_result = evaluate_assertions(
+                    case=case,
+                    sql=generated_sql,
+                    assertion_registry=assertion_registry,
+                )
+        else:
+            assertion_result = LayerResult(
+                layer=syntax_result.layer,
+                passed=True,
+                skipped=True,
+            )
+
+        judge_result = None
+        if judge_obj is not None:
+            judge_input = JudgeInput(
+                question=case.question,
+                generated_sql=generated_sql,
+                expected_sql=case.expected.sql if case.expected else None,
+                execution_result=raw_execution_result if db is not None else None,
+                assertion_failures=assertion_result.failures,
+                schema_annotations=schema_annotations,
+            )
+            judge_result = judge_obj.evaluate(judge_input)
+            judge_count += 1
+
         result = _build_result(
             case=case,
             generated_sql=generated_sql,
@@ -239,6 +332,8 @@ def _run_cases(
         if raw_execution_result is not None:
             result._execution_success = raw_execution_result.success
             result._execution_row_count = raw_execution_result.row_count
+        if judge_result is not None:
+            result._judge_result = judge_result
         results.append(result)
         _print_case_result(result)
 
@@ -254,6 +349,8 @@ def _run_cases(
     console.print(f"Critical: {critical_count}")
     if db is not None:
         console.print(f"Execution: ran against {db}")
+    if judge:
+        console.print(f"Judge: ran on {judge_count} cases")
 
     if output is not None:
         _write_json_report(output, results)
@@ -277,6 +374,17 @@ def run(
             "duckdb://./fixtures/warehouse.db or duckdb://:memory:"
         ),
     ),
+    judge: bool = typer.Option(
+        False,
+        "--judge",
+        is_flag=True,
+        help="Run LLM judge evaluation (requires ANTHROPIC_API_KEY).",
+    ),
+    annotations: Optional[str] = typer.Option(
+        None,
+        "--annotations",
+        help="Path to schema annotations YAML. Example: schema/annotations.yaml",
+    ),
 ) -> None:
     _run_cases(
         path=path,
@@ -285,6 +393,8 @@ def run(
         output=output,
         fail_on=fail_on,
         db=db,
+        judge=judge,
+        annotations=annotations,
     )
 
 
