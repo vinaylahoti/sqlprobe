@@ -10,7 +10,7 @@ input:
 
 expected:
   sql: |
-    SELECT SUM(t.net_revenue)
+    SELECT SUM(t.net_revenue) AS net_revenue_sum
     FROM transactions t
     JOIN accounts a ON t.account_id = a.id
     WHERE a.segment IN ('ENT', 'ENTERPRISE')
@@ -20,6 +20,10 @@ expected:
       AND t.status = 'recognized'
   result_shape:
     row_count: 1
+    value_range:
+      net_revenue_sum:
+        min: 1000000
+        max: 50000000
   intent_components:
     metric: recognized revenue
     segment_filter: enterprise

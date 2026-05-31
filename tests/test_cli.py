@@ -64,13 +64,70 @@ def test_json_report_generated(tmp_path):
             "case_id": "churn_rate_monthly",
             "passed": True,
             "failure_modes": [],
+            "execution": {"ran": False},
         },
         {
             "case_id": "revenue_q1_enterprise",
             "passed": True,
             "failure_modes": [],
+            "execution": {"ran": False},
         },
     ]
+
+
+def test_run_with_db_flag_passes():
+    result = runner.invoke(
+        app,
+        [
+            "run",
+            "cases/examples/",
+            "--db",
+            "duckdb://./fixtures/warehouse.db",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert "PASS  churn_rate_monthly" in result.output
+    assert "PASS  revenue_q1_enterprise" in result.output
+    assert "Execution: ran against duckdb://./fixtures/warehouse.db" in (
+        result.output
+    )
+
+
+def test_run_with_db_flag_json_includes_execution_key(tmp_path):
+    output = tmp_path / "report.json"
+
+    result = runner.invoke(
+        app,
+        [
+            "run",
+            "cases/examples/",
+            "--db",
+            "duckdb://./fixtures/warehouse.db",
+            "--output",
+            str(output),
+        ],
+    )
+
+    assert result.exit_code == 0
+    report = json.loads(output.read_text(encoding="utf-8"))
+    assert all(entry["execution"]["ran"] is True for entry in report)
+    assert all("success" in entry["execution"] for entry in report)
+    assert all("row_count" in entry["execution"] for entry in report)
+    assert all("failures" in entry["execution"] for entry in report)
+
+
+def test_run_without_db_json_has_execution_not_ran(tmp_path):
+    output = tmp_path / "report.json"
+
+    result = runner.invoke(
+        app,
+        ["run", "cases/examples/", "--output", str(output)],
+    )
+
+    assert result.exit_code == 0
+    report = json.loads(output.read_text(encoding="utf-8"))
+    assert all(entry["execution"] == {"ran": False} for entry in report)
 
 
 def test_demo_command_executes():

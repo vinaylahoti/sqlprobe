@@ -40,8 +40,12 @@ def _load_assertions() -> dict[str, Assertion]:
 def _collect_failures(
     syntax_result: LayerResult,
     assertion_result: LayerResult,
+    execution_result: Optional[LayerResult] = None,
 ) -> list[AssertionFailure]:
-    return [*syntax_result.failures, *assertion_result.failures]
+    failures = [*syntax_result.failures, *assertion_result.failures]
+    if execution_result is not None:
+        failures.extend(execution_result.failures)
+    return failures
 
 
 def _overall_severity(failures: list[AssertionFailure]) -> Optional[Severity]:
@@ -62,7 +66,11 @@ def _build_result(
     assertion_result: LayerResult,
     execution_result: LayerResult,
 ) -> EvaluationResult:
-    failures = _collect_failures(syntax_result, assertion_result)
+    failures = _collect_failures(
+        syntax_result,
+        assertion_result,
+        execution_result,
+    )
     failure_modes = [
         failure.failure_mode
         for failure in failures
@@ -71,7 +79,11 @@ def _build_result(
     return EvaluationResult(
         case_id=case.id,
         generated_sql=generated_sql,
-        passed=syntax_result.passed and assertion_result.passed,
+        passed=(
+            syntax_result.passed
+            and assertion_result.passed
+            and execution_result.passed
+        ),
         syntax=syntax_result,
         execution=execution_result,
         business=assertion_result,
@@ -90,6 +102,8 @@ def _print_case_result(result: EvaluationResult) -> None:
         failures.extend(result.syntax.failures)
     if result.business is not None:
         failures.extend(result.business.failures)
+    if result.execution is not None:
+        failures.extend(result.execution.failures)
 
     for failure in failures:
         failure_mode = (
@@ -110,10 +124,36 @@ def _write_json_report(path: Path, results: list[EvaluationResult]) -> None:
             "failure_modes": [
                 failure_mode.value for failure_mode in result.failure_modes
             ],
+            "execution": _execution_report_entry(result),
         }
         for result in results
     ]
     path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+
+
+def _execution_report_entry(result: EvaluationResult) -> dict:
+    execution = result.execution
+    if execution is None or execution.skipped:
+        return {"ran": False}
+
+    return {
+        "ran": True,
+        "success": getattr(result, "_execution_success", execution.passed),
+        "row_count": getattr(result, "_execution_row_count", None),
+        "failures": [
+            {
+                "assertion_id": failure.assertion_id,
+                "detail": failure.detail,
+                "failure_mode": (
+                    failure.failure_mode.value
+                    if failure.failure_mode is not None
+                    else None
+                ),
+                "severity": failure.severity.value,
+            }
+            for failure in execution.failures
+        ],
+    }
 
 
 @app.command()
@@ -152,6 +192,7 @@ def _run_cases(
     dialect: str = "ansi",
     output: Optional[Path] = None,
     fail_on: Optional[str] = None,
+    db: Optional[str] = None,
 ) -> None:
     cases = _load_cases(path)
     assertion_registry = _load_assertions()
@@ -176,7 +217,18 @@ def _run_cases(
             if syntax_result.passed
             else LayerResult(layer=syntax_result.layer, passed=True, skipped=True)
         )
-        execution_result = evaluate_execution(generated_sql)
+        if db is None:
+            execution_result = evaluate_execution(generated_sql)
+            raw_execution_result = None
+        else:
+            from ..adapters.duckdb import DuckDBAdapter
+
+            with DuckDBAdapter(db_url=db) as adapter:
+                raw_execution_result = adapter.execute(generated_sql)
+            execution_result = evaluate_execution(
+                raw_execution_result,
+                case.expected.result_shape,
+            )
         result = _build_result(
             case=case,
             generated_sql=generated_sql,
@@ -184,6 +236,9 @@ def _run_cases(
             assertion_result=assertion_result,
             execution_result=execution_result,
         )
+        if raw_execution_result is not None:
+            result._execution_success = raw_execution_result.success
+            result._execution_row_count = raw_execution_result.row_count
         results.append(result)
         _print_case_result(result)
 
@@ -197,6 +252,8 @@ def _run_cases(
     console.print(f"Passed: {passed_count}")
     console.print(f"Failed: {failed_count}")
     console.print(f"Critical: {critical_count}")
+    if db is not None:
+        console.print(f"Execution: ran against {db}")
 
     if output is not None:
         _write_json_report(output, results)
@@ -212,6 +269,14 @@ def run(
     dialect: str = typer.Option("ansi", "--dialect"),
     output: Optional[Path] = typer.Option(None, "--output"),
     fail_on: Optional[str] = typer.Option(None, "--fail-on"),
+    db: Optional[str] = typer.Option(
+        None,
+        "--db",
+        help=(
+            "DuckDB connection URL. Example: "
+            "duckdb://./fixtures/warehouse.db or duckdb://:memory:"
+        ),
+    ),
 ) -> None:
     _run_cases(
         path=path,
@@ -219,6 +284,7 @@ def run(
         dialect=dialect,
         output=output,
         fail_on=fail_on,
+        db=db,
     )
 
 

@@ -25,6 +25,10 @@
 - [x] tests/test_duckdb_adapter.py added and passing
 - [x] execution evaluator implemented in evaluators/execution.py
 - [x] tests/test_execution_evaluator.py added and passing
+- [x] --db flag added to run command
+- [x] Execution layer wired in CLI
+- [x] JSON report extended with execution key
+- [x] revenue_q1_enterprise.yaml updated with result_shape and aliased aggregate
 
 ---
 
@@ -104,6 +108,7 @@
 | `sqlprobe validate <cases/>` | Implemented |
 | `sqlprobe run <cases/>` | Implemented |
 | `sqlprobe run --sql "..."` | Implemented |
+| `sqlprobe run --db duckdb://...` | Implemented |
 | `sqlprobe demo` | Implemented |
 | `sqlprobe baseline create` | Not planned for v0.0.1 |
 
