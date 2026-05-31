@@ -23,6 +23,8 @@
 - [x] scripts/build_fixture_db.py created
 - [x] DuckDBAdapter implemented in adapters/duckdb.py
 - [x] tests/test_duckdb_adapter.py added and passing
+- [x] execution evaluator implemented in evaluators/execution.py
+- [x] tests/test_execution_evaluator.py added and passing
 
 ---
 
