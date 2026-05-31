@@ -29,8 +29,8 @@
 - [x] `sqlprobe/core/result.py` — EvaluationResult, LayerResult, AssertionFailure
 
 ### Loaders
-- [ ] `sqlprobe/loader/case_loader.py` — not yet implemented
-- [ ] `sqlprobe/loader/assertion_loader.py` — not yet implemented
+- [x] `sqlprobe/loader/case_loader.py`
+- [x] `sqlprobe/loader/assertion_loader.py`
 
 ### Evaluators
 - [ ] `sqlprobe/evaluators/syntax.py` — not yet implemented
@@ -48,13 +48,13 @@
 - [ ] `sqlprobe/cli/main.py` — not yet implemented
 
 ### Assertion Library (YAML)
-- [ ] `assertions/revenue.yaml` — not yet implemented
-- [ ] `assertions/filters.yaml` — not yet implemented
-- [ ] `assertions/date_handling.yaml` — not yet implemented
+- [x] `assertions/revenue.yaml`
+- [x] `assertions/filters.yaml`
+- [x] `assertions/date_handling.yaml`
 
 ### Example Cases (YAML)
-- [ ] `cases/examples/revenue_q1_enterprise.yaml` — not yet implemented
-- [ ] `cases/examples/churn_rate_monthly.yaml` — not yet implemented
+- [x] `cases/examples/revenue_q1_enterprise.yaml`
+- [x] `cases/examples/churn_rate_monthly.yaml`
 
 ### Tests
 - [ ] `tests/test_case_loader.py` — not yet implemented

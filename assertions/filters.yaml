@@ -1,0 +1,22 @@
+- id: require_explicit_date_filter
+  description: "Time-series queries must include a date filter"
+  trigger:
+    sql_references_any:
+      - "transactions"
+      - "events"
+      - "sessions"
+      - "orders"
+    question_contains_any:
+      - "last"
+      - "this"
+      - "quarter"
+      - "month"
+      - "year"
+      - "Q1"
+      - "Q2"
+      - "Q3"
+      - "Q4"
+  assert:
+    requires_column: "date"
+  severity: warning
+  failure_mode: WRONG_DATE_BOUNDARY

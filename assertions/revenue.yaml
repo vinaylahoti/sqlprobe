@@ -1,0 +1,29 @@
+- id: revenue_excludes_test_accounts
+  description: "Revenue queries must always filter out test/demo accounts"
+  trigger:
+    sql_references_any:
+      - "transactions.amount"
+      - "net_revenue"
+      - "mrr"
+      - "arr"
+      - "revenue"
+  assert:
+    sql_contains_filter:
+      column: "accounts.is_test"
+      operator: "="
+      value: false
+  severity: critical
+  failure_mode: MISSING_BUSINESS_FILTER
+
+- id: revenue_no_select_star
+  description: "Revenue queries must not use SELECT *"
+  trigger:
+    sql_references_any:
+      - "revenue"
+      - "mrr"
+      - "arr"
+      - "net_revenue"
+  assert:
+    no_select_star: true
+  severity: warning
+  failure_mode: COLUMN_SUBSTITUTION

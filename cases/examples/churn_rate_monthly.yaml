@@ -1,0 +1,28 @@
+id: churn_rate_monthly
+version: "1.0"
+description: "Monthly churn rate for last 3 months"
+
+input:
+  question: "What is our monthly churn rate for the last 3 months?"
+  context:
+    user_role: growth_analyst
+
+expected:
+  sql: |
+    SELECT
+      DATE_TRUNC('month', cancelled_at) AS month,
+      COUNT(*) * 1.0 / NULLIF(
+        (SELECT COUNT(*) FROM subscriptions WHERE status = 'active'), 0
+      ) AS churn_rate
+    FROM subscriptions
+    WHERE cancelled_at >= CURRENT_DATE - INTERVAL '3 months'
+      AND status = 'cancelled'
+    GROUP BY 1
+    ORDER BY 1
+
+assertions:
+  - revenue_no_select_star
+  - require_explicit_date_filter
+
+tags: [churn, subscriptions, growth]
+status: active

@@ -1,0 +1,36 @@
+id: revenue_q1_enterprise
+version: "1.0"
+description: "Recognized revenue from enterprise segment, fiscal Q1 2024"
+
+input:
+  question: "What was total recognized revenue from enterprise customers in Q1 2024?"
+  context:
+    fiscal_year_start: february
+    user_role: finance_analyst
+
+expected:
+  sql: |
+    SELECT SUM(t.net_revenue)
+    FROM transactions t
+    JOIN accounts a ON t.account_id = a.id
+    WHERE a.segment IN ('ENT', 'ENTERPRISE')
+      AND a.is_test = false
+      AND t.recognized_at >= '2024-02-01'
+      AND t.recognized_at < '2024-05-01'
+      AND t.status = 'recognized'
+  result_shape:
+    row_count: 1
+  intent_components:
+    metric: recognized revenue
+    segment_filter: enterprise
+    time_scope: fiscal Q1 2024
+    grain: total aggregate
+
+assertions:
+  - revenue_excludes_test_accounts
+  - revenue_no_select_star
+
+tags: [revenue, enterprise, fiscal, finance]
+created_at: "2024-01-15"
+created_by: analytics-team
+status: active
