@@ -25,8 +25,8 @@
 
 ### Core
 - [x] `sqlprobe/core/taxonomy.py` — all 18 failure modes, Layer, Severity, FailureModeMetadata, FAILURE_MODE_REGISTRY
-- [ ] `sqlprobe/core/case.py` — not yet implemented
-- [ ] `sqlprobe/core/result.py` — not yet implemented
+- [x] `sqlprobe/core/case.py` — EvaluationCase, ExpectedOutput, ExpectedResultShape, InputContext
+- [x] `sqlprobe/core/result.py` — EvaluationResult, LayerResult, AssertionFailure
 
 ### Loaders
 - [ ] `sqlprobe/loader/case_loader.py` — not yet implemented
@@ -99,7 +99,7 @@ None yet.
 
 ## Next Up
 
-- `sqlprobe/core/case.py` — EvaluationCase dataclass
-- `sqlprobe/core/result.py` — EvaluationResult dataclass
+- `sqlprobe/loader/case_loader.py` — YAML loader for evaluation cases
+- `sqlprobe/loader/assertion_loader.py` — YAML loader for assertion definitions
 
 ---
