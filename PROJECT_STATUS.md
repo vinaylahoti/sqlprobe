@@ -29,6 +29,7 @@
 - [x] Execution layer wired in CLI
 - [x] JSON report extended with execution key
 - [x] revenue_q1_enterprise.yaml updated with result_shape and aliased aggregate
+- [x] tests/test_integration.py added and passing
 
 ---
 
