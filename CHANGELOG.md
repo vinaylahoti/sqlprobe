@@ -35,5 +35,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - package entrypoint verified
 - editable install verified
 - package metadata verified
+- README updated for v0.0.1 release readiness
+- RELEASE_CHECKLIST.md added
 
 ---

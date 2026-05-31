@@ -18,10 +18,10 @@
 - [x] Package scaffold created (`sqlprobe/` with all subdirectories)
 - [x] `pyproject.toml` with correct dependencies
 - [x] `LICENSE` (Apache 2.0)
-- [x] `README.md` (full vision document)
+- [x] `README.md` (v0.0.1 quickstart and current scope)
 - [x] `IMPLEMENTATION_PLAN.md` (build plan)
-- [x] Empty placeholder files for all planned modules
-- [x] Empty YAML files for assertions and example cases
+- [x] Placeholder files for future modules
+- [x] YAML files for assertions and example cases
 
 ### Core
 - [x] `sqlprobe/core/taxonomy.py` — all 18 failure modes, Layer, Severity, FailureModeMetadata, FAILURE_MODE_REGISTRY
@@ -57,9 +57,11 @@
 - [x] `cases/examples/churn_rate_monthly.yaml`
 
 ### Tests
-- [ ] `tests/test_case_loader.py` — not yet implemented
-- [ ] `tests/test_syntax_evaluator.py` — not yet implemented
-- [ ] `tests/test_assertion_engine.py` — not yet implemented
+- [x] `tests/test_assertion_engine.py`
+- [x] `tests/test_cli.py`
+- [x] `tests/test_package.py`
+- [x] `tests/test_stubs.py`
+- [x] `tests/test_syntax_evaluator.py`
 
 ### Docs
 - [ ] `docs/failure-modes.md` — not yet implemented
@@ -99,7 +101,7 @@ None yet.
 
 ## Next Up
 
-- `sqlprobe/loader/case_loader.py` — YAML loader for evaluation cases
-- `sqlprobe/loader/assertion_loader.py` — YAML loader for assertion definitions
+- `docs/failure-modes.md` — failure mode reference
+- CI workflow for test automation
 
 ---
