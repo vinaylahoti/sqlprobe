@@ -18,6 +18,9 @@
 - [x] ExpectedResultShape extended with columns_present, no_nulls_in
 - [x] case_loader updated to parse new fields
 - [x] duckdb added to dev dependencies
+- [x] fixtures/seed.sql created
+- [x] fixtures/warehouse.db generated and committed
+- [x] scripts/build_fixture_db.py created
 
 ---
 
