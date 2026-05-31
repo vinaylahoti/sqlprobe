@@ -45,7 +45,7 @@
 - [x] `sqlprobe/regression/baseline.py`
 
 ### CLI
-- [ ] `sqlprobe/cli/main.py` — not yet implemented
+- [x] `sqlprobe/cli/main.py`
 
 ### Assertion Library (YAML)
 - [x] `assertions/revenue.yaml`
@@ -83,10 +83,10 @@
 
 | Command | Status |
 |---|---|
-| `sqlprobe validate <cases/>` | Not implemented |
-| `sqlprobe run <cases/>` | Not implemented |
-| `sqlprobe run --sql "..."` | Not implemented |
-| `sqlprobe demo` | Not implemented |
+| `sqlprobe validate <cases/>` | Implemented |
+| `sqlprobe run <cases/>` | Implemented |
+| `sqlprobe run --sql "..."` | Implemented |
+| `sqlprobe demo` | Implemented |
 | `sqlprobe baseline create` | Not planned for v0.0.1 |
 
 ---

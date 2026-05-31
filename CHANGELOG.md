@@ -26,5 +26,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - judge evaluator stub added
 - DuckDB adapter stub added
 - baseline regression stub added
+- Typer CLI implemented
+- validate command implemented
+- run command implemented
+- demo command implemented
+- JSON report support added
 
 ---
