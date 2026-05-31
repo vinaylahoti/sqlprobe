@@ -39,6 +39,9 @@
 - [x] result_column_satisfies assertion type implemented
 - [x] assertions/churn.yaml created
 - [x] tests/test_result_assertions.py added and passing
+- [x] SQLProbeJudge implemented in evaluators/judge.py
+- [x] JudgeInput dataclass added
+- [x] tests/test_judge.py added and passing (all mocked, no real API calls)
 
 ---
 
