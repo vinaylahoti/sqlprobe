@@ -6,7 +6,7 @@
 
 ---
 
-## Current Version: v0.0.1 (in development)
+## Current Version: v0.0.2 (in development → complete)
 
 ## Last Updated: 2026-05-31
 
@@ -14,22 +14,16 @@
 
 ## Phase 2 Status
 
-- [x] ExecutionResult dataclass added to core/result.py
-- [x] ExpectedResultShape extended with columns_present, no_nulls_in
-- [x] case_loader updated to parse new fields
-- [x] duckdb added to dev dependencies
-- [x] fixtures/seed.sql created
-- [x] fixtures/warehouse.db generated and committed
-- [x] scripts/build_fixture_db.py created
-- [x] DuckDBAdapter implemented in adapters/duckdb.py
-- [x] tests/test_duckdb_adapter.py added and passing
-- [x] execution evaluator implemented in evaluators/execution.py
-- [x] tests/test_execution_evaluator.py added and passing
-- [x] --db flag added to run command
-- [x] Execution layer wired in CLI
+- [x] DuckDBAdapter implemented
+- [x] Execution evaluator implemented
+- [x] --db flag wired in CLI
 - [x] JSON report extended with execution key
-- [x] revenue_q1_enterprise.yaml updated with result_shape and aliased aggregate
-- [x] tests/test_integration.py added and passing
+- [x] fixtures/seed.sql and warehouse.db created
+- [x] tests/test_duckdb_adapter.py (9 tests)
+- [x] tests/test_execution_evaluator.py (12 tests)
+- [x] tests/test_integration.py (9 tests)
+- [x] docs/failure-modes.md written
+- [x] README.md updated for v0.0.2
 
 ---
 
@@ -37,17 +31,19 @@
 
 ### Repository Structure
 - [x] Package scaffold created (`sqlprobe/` with all subdirectories)
-- [x] `pyproject.toml` with correct dependencies
+- [x] `pyproject.toml` with correct dependencies and optional DuckDB extra
 - [x] `LICENSE` (Apache 2.0)
-- [x] `README.md` (v0.0.1 quickstart and current scope)
-- [x] `IMPLEMENTATION_PLAN.md` (build plan)
-- [x] Placeholder files for future modules
+- [x] `README.md` (v0.0.2 quickstart and current scope)
+- [x] `IMPLEMENTATION_PLAN.md` (v0.0.1 build plan)
+- [x] `PROJECT_STATUS.md`
+- [x] `CHANGELOG.md`
 - [x] YAML files for assertions and example cases
+- [x] DuckDB fixture database and seed SQL
 
 ### Core
 - [x] `sqlprobe/core/taxonomy.py` — all 18 failure modes, Layer, Severity, FailureModeMetadata, FAILURE_MODE_REGISTRY
 - [x] `sqlprobe/core/case.py` — EvaluationCase, ExpectedOutput, ExpectedResultShape, InputContext
-- [x] `sqlprobe/core/result.py` — EvaluationResult, LayerResult, AssertionFailure
+- [x] `sqlprobe/core/result.py` — EvaluationResult, LayerResult, AssertionFailure, ExecutionResult
 
 ### Loaders
 - [x] `sqlprobe/loader/case_loader.py`
@@ -57,16 +53,21 @@
 - [x] `sqlprobe/evaluators/syntax.py`
 - [x] `sqlprobe/evaluators/assertions.py`
 - [x] `sqlprobe/evaluators/execution.py`
-- [x] `sqlprobe/evaluators/judge.py`
+- [x] `sqlprobe/evaluators/judge.py` — skipped stub for Phase 3
 
 ### Adapters
 - [x] `sqlprobe/adapters/duckdb.py`
 
 ### Regression
-- [x] `sqlprobe/regression/baseline.py`
+- [x] `sqlprobe/regression/baseline.py` — skipped stub for future baseline comparison
 
 ### CLI
 - [x] `sqlprobe/cli/main.py`
+
+### Fixtures
+- [x] `fixtures/seed.sql`
+- [x] `fixtures/warehouse.db`
+- [x] `scripts/build_fixture_db.py`
 
 ### Assertion Library (YAML)
 - [x] `assertions/revenue.yaml`
@@ -80,25 +81,15 @@
 ### Tests
 - [x] `tests/test_assertion_engine.py`
 - [x] `tests/test_cli.py`
+- [x] `tests/test_duckdb_adapter.py`
+- [x] `tests/test_execution_evaluator.py`
+- [x] `tests/test_integration.py`
 - [x] `tests/test_package.py`
 - [x] `tests/test_stubs.py`
 - [x] `tests/test_syntax_evaluator.py`
 
 ### Docs
-- [ ] `docs/failure-modes.md` — not yet implemented
-
----
-
-## What Does NOT Exist Yet (Planned)
-
-- DuckDB execution adapter
-- LLM judge (Anthropic + OpenAI)
-- Baseline pinning and regression detection
-- Semantic schema annotations
-- dbt importer
-- Trace store
-- CI/CD workflow
-- PyPI publishing workflow
+- [x] `docs/failure-modes.md`
 
 ---
 
@@ -110,8 +101,21 @@
 | `sqlprobe run <cases/>` | Implemented |
 | `sqlprobe run --sql "..."` | Implemented |
 | `sqlprobe run --db duckdb://...` | Implemented |
+| `sqlprobe run --output report.json` | Implemented |
 | `sqlprobe demo` | Implemented |
-| `sqlprobe baseline create` | Not planned for v0.0.1 |
+| `sqlprobe baseline create` | Not implemented |
+
+---
+
+## What Does NOT Exist Yet (Phase 3 And Later)
+
+- LLM judge (`evaluators/judge.py`) — Anthropic Claude API, structured output
+- Result assertions (checked against execution output, e.g. `churn_rate_bounded`)
+- Baseline pinning and regression detection
+- Semantic schema annotations
+- dbt importer
+- CI/CD workflow
+- PyPI publishing
 
 ---
 
@@ -123,7 +127,6 @@ None yet.
 
 ## Next Up
 
-- `docs/failure-modes.md` — failure mode reference
-- CI workflow for test automation
+- Phase 3: LLM judge — see `SQLPROBE_PHASE2_CONTEXT.md` for Phase 3 scope
 
 ---
