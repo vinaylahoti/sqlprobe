@@ -20,5 +20,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Built-in assertion library created (4 assertions across 3 files)
 - Two example evaluation cases created
 - syntax evaluator implemented using sqlglot
+- structural assertion engine implemented
+- AST-based filter detection using sqlglot
 
 ---

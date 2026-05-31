@@ -34,7 +34,7 @@
 
 ### Evaluators
 - [x] `sqlprobe/evaluators/syntax.py`
-- [ ] `sqlprobe/evaluators/assertions.py` — not yet implemented
+- [x] `sqlprobe/evaluators/assertions.py`
 - [ ] `sqlprobe/evaluators/execution.py` — stub planned
 - [ ] `sqlprobe/evaluators/judge.py` — stub planned
 

@@ -3,6 +3,7 @@
   trigger:
     sql_references_any:
       - "transactions.amount"
+      - "amount"
       - "net_revenue"
       - "mrr"
       - "arr"
