@@ -21,6 +21,8 @@
 - [x] fixtures/seed.sql created
 - [x] fixtures/warehouse.db generated and committed
 - [x] scripts/build_fixture_db.py created
+- [x] DuckDBAdapter implemented in adapters/duckdb.py
+- [x] tests/test_duckdb_adapter.py added and passing
 
 ---
 

@@ -1,10 +1,9 @@
-import pytest
-
-from sqlprobe.adapters.duckdb import DuckDBAdapter
 from sqlprobe.core.taxonomy import Layer
 from sqlprobe.evaluators.execution import evaluate_execution
 from sqlprobe.evaluators.judge import evaluate_with_judge
 from sqlprobe.regression.baseline import compare_baseline, create_baseline
+
+import pytest
 
 
 def test_evaluate_execution_imports_successfully():
@@ -26,22 +25,6 @@ def test_evaluate_with_judge_returns_skipped_response():
         "skipped": True,
         "reason": "LLM judge not implemented in v0.0.1",
     }
-
-
-def test_duckdb_adapter_connect_raises_not_implemented():
-    with pytest.raises(
-        NotImplementedError,
-        match="DuckDB adapter is planned for a future release.",
-    ):
-        DuckDBAdapter().connect()
-
-
-def test_duckdb_adapter_execute_raises_not_implemented():
-    with pytest.raises(
-        NotImplementedError,
-        match="DuckDB adapter is planned for a future release.",
-    ):
-        DuckDBAdapter().execute("SELECT 1")
 
 
 def test_create_baseline_raises_not_implemented():
