@@ -1,0 +1,32 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sqlprobe"
+version = "0.0.1"
+description = "Production trust layer for AI-generated SQL"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+dependencies = [
+    "typer>=0.12.0",
+    "rich>=13.0.0",
+    "pyyaml>=6.0",
+    "sqlglot>=23.0.0",
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=5.0.0",
+]
+duckdb = ["duckdb>=0.10.0"]
+llm = ["anthropic>=0.25.0", "openai>=1.0.0"]
+
+[project.scripts]
+sqlprobe = "sqlprobe.cli.main:app"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
