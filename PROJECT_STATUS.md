@@ -12,6 +12,15 @@
 
 ---
 
+## Phase 2 Status
+
+- [x] ExecutionResult dataclass added to core/result.py
+- [x] ExpectedResultShape extended with columns_present, no_nulls_in
+- [x] case_loader updated to parse new fields
+- [x] duckdb added to dev dependencies
+
+---
+
 ## What Exists Today
 
 ### Repository Structure

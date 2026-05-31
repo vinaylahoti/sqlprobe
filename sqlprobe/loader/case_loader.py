@@ -32,6 +32,8 @@ def _parse_case(data: dict, source: str) -> EvaluationCase:
             row_count=rs.get("row_count"),
             columns=rs.get("columns"),
             value_range=rs.get("value_range"),
+            columns_present=rs.get("columns_present"),
+            no_nulls_in=rs.get("no_nulls_in"),
         )
 
     context = None

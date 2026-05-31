@@ -8,6 +8,8 @@ class ExpectedResultShape:
     row_count: Optional[int] = None
     columns: Optional[list[str]] = None
     value_range: Optional[dict[str, dict]] = None
+    columns_present: Optional[list[str]] = None
+    no_nulls_in: Optional[list[str]] = None
 
 
 @dataclass

@@ -40,3 +40,14 @@ class EvaluationResult:
         status = "✓ PASS" if self.passed else "✗ FAIL"
         modes = ", ".join(f.value for f in self.failure_modes)
         return f"{status}  {self.case_id}" + (f"  [{modes}]" if modes else "")
+
+
+@dataclass
+class ExecutionResult:
+    success: bool
+    rows: list[dict] | None
+    row_count: int | None
+    columns: list[str] | None
+    error: str | None
+    duration_ms: float
+    failure_mode: FailureMode | None
