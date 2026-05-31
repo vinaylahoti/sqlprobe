@@ -32,5 +32,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - demo command implemented
 - JSON report support added
 - Corrected revenue assertion attribution for gross amount vs created_at failures
+- package entrypoint verified
+- editable install verified
+- package metadata verified
 
 ---
