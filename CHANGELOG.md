@@ -22,5 +22,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - syntax evaluator implemented using sqlglot
 - structural assertion engine implemented
 - AST-based filter detection using sqlglot
+- execution evaluator stub added
+- judge evaluator stub added
+- DuckDB adapter stub added
+- baseline regression stub added
 
 ---

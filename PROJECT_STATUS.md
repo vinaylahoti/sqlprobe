@@ -35,14 +35,14 @@
 ### Evaluators
 - [x] `sqlprobe/evaluators/syntax.py`
 - [x] `sqlprobe/evaluators/assertions.py`
-- [ ] `sqlprobe/evaluators/execution.py` — stub planned
-- [ ] `sqlprobe/evaluators/judge.py` — stub planned
+- [x] `sqlprobe/evaluators/execution.py`
+- [x] `sqlprobe/evaluators/judge.py`
 
 ### Adapters
-- [ ] `sqlprobe/adapters/duckdb.py` — stub planned
+- [x] `sqlprobe/adapters/duckdb.py`
 
 ### Regression
-- [ ] `sqlprobe/regression/baseline.py` — stub planned
+- [x] `sqlprobe/regression/baseline.py`
 
 ### CLI
 - [ ] `sqlprobe/cli/main.py` — not yet implemented
