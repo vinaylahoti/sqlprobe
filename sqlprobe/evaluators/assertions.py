@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import fnmatch
 from typing import Any
 
 import sqlglot
 from sqlglot import exp
 
 from ..core.case import EvaluationCase
-from ..core.result import AssertionFailure, LayerResult
+from ..core.result import AssertionFailure, ExecutionResult, LayerResult
 from ..core.taxonomy import FailureMode, Layer, Severity
 from ..loader.assertion_loader import Assertion, AssertionCheck, AssertionTrigger
 
@@ -32,10 +33,10 @@ AGGREGATION_EXPRESSIONS = {
 
 
 def evaluate_assertions(
-    *,
     case: EvaluationCase,
     sql: str,
     assertion_registry: dict[str, Assertion],
+    execution_result: ExecutionResult | None = None,
 ) -> LayerResult:
     failures: list[AssertionFailure] = []
 
@@ -72,6 +73,19 @@ def evaluate_assertions(
             continue
 
         failures.extend(_evaluate_assertion(tree, sql, assertion))
+
+    if execution_result is not None:
+        for assertion_id in case.assertions:
+            assertion = assertion_registry.get(assertion_id)
+            if assertion is None:
+                continue
+            if assertion.assert_.result_column_satisfies is None:
+                continue
+            if not _triggers_match(sql, case.question, assertion.trigger):
+                continue
+            failures.extend(
+                _evaluate_result_assertion(assertion, execution_result)
+            )
 
     return LayerResult(
         layer=Layer.BUSINESS,
@@ -166,6 +180,92 @@ def _evaluate_assertion(
         )
 
     return failures
+
+
+def _evaluate_result_assertion(
+    assertion: Assertion,
+    execution_result: ExecutionResult,
+) -> list[AssertionFailure]:
+    result_check = assertion.assert_.result_column_satisfies
+    if result_check is None:
+        return []
+
+    column_pattern = result_check.get("column_pattern", "")
+    condition = result_check.get("condition", "")
+    matching_cols = [
+        col for col in (execution_result.columns or [])
+        if fnmatch.fnmatch(col.lower(), column_pattern.lower())
+    ]
+    if not matching_cols:
+        return []
+
+    failures: list[AssertionFailure] = []
+    first_row = execution_result.rows[0] if execution_result.rows else {}
+
+    for col in matching_cols:
+        value = first_row.get(col)
+        if (
+            value is None
+            and condition.upper() not in ("IS NULL", "IS NOT NULL")
+        ):
+            failures.append(
+                AssertionFailure(
+                    assertion_id=assertion.id,
+                    detail=(
+                        f"Column '{col}' is NULL, cannot evaluate condition "
+                        f"'{condition}'"
+                    ),
+                    failure_mode=FailureMode.NULL_PROPAGATION,
+                    severity=assertion.severity,
+                )
+            )
+            continue
+
+        if not _condition_satisfied(value, condition):
+            failures.append(
+                AssertionFailure(
+                    assertion_id=assertion.id,
+                    detail=(
+                        f"Column '{col}' value {value} failed condition "
+                        f"'{condition}'"
+                    ),
+                    failure_mode=assertion.failure_mode,
+                    severity=assertion.severity,
+                )
+            )
+
+    return failures
+
+
+def _condition_satisfied(value: Any, condition: str) -> bool:
+    normalized = condition.strip()
+    upper = normalized.upper()
+
+    if upper == "IS NOT NULL":
+        return value is not None
+    if upper == "IS NULL":
+        return value is None
+
+    if upper.startswith("BETWEEN "):
+        parts = normalized.split()
+        if len(parts) != 4 or parts[2].upper() != "AND":
+            return False
+        lower = float(parts[1])
+        upper_bound = float(parts[3])
+        return lower <= float(value) <= upper_bound
+
+    if normalized.startswith(">="):
+        return float(value) >= float(normalized[2:].strip())
+    if normalized.startswith("<="):
+        return float(value) <= float(normalized[2:].strip())
+    if normalized.startswith(">"):
+        return float(value) > float(normalized[1:].strip())
+    if normalized.startswith("<"):
+        return float(value) < float(normalized[1:].strip())
+    if normalized.startswith("="):
+        return float(value) == float(normalized[1:].strip())
+
+    return False
 
 
 def _sql_contains_filter(tree: exp.Expression, filter_spec: dict[str, Any]) -> bool:

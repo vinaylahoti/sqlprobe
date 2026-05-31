@@ -20,6 +20,7 @@ class AssertionCheck:
     requires_column: Optional[str] = None
     aggregation_type: Optional[str] = None
     no_select_star: Optional[bool] = None
+    result_column_satisfies: Optional[dict] = None
 
 
 @dataclass
@@ -69,6 +70,7 @@ def _parse_assertion(data: dict) -> Assertion:
         requires_column=assert_data.get("requires_column"),
         aggregation_type=assert_data.get("aggregation_type"),
         no_select_star=assert_data.get("no_select_star"),
+        result_column_satisfies=assert_data.get("result_column_satisfies"),
     )
     return Assertion(
         id=data["id"],

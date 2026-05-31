@@ -36,6 +36,9 @@
 - [x] build_annotation_context() implemented
 - [x] schema/annotations.yaml created
 - [x] tests/test_annotation_loader.py added and passing
+- [x] result_column_satisfies assertion type implemented
+- [x] assertions/churn.yaml created
+- [x] tests/test_result_assertions.py added and passing
 
 ---
 

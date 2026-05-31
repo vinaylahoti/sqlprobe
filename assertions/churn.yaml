@@ -1,0 +1,21 @@
+- id: churn_rate_bounded
+  description: "Churn rate must be between 0 and 1 (a ratio, not a percentage)"
+  trigger:
+    question_contains_any: ["churn", "churn rate"]
+  assert:
+    result_column_satisfies:
+      column_pattern: "*churn*"
+      condition: "BETWEEN 0 AND 1"
+  severity: warning
+  failure_mode: NULL_PROPAGATION
+
+- id: revenue_non_negative
+  description: "Revenue aggregates must never be negative"
+  trigger:
+    sql_references_any: ["net_revenue", "mrr", "arr"]
+  assert:
+    result_column_satisfies:
+      column_pattern: "*revenue*"
+      condition: "> 0"
+  severity: critical
+  failure_mode: WRONG_AGGREGATION
