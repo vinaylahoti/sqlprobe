@@ -28,6 +28,7 @@ expected:
 
 assertions:
   - revenue_excludes_test_accounts
+  - no_amount_for_revenue
   - no_created_at_for_revenue
   - revenue_no_select_star
 

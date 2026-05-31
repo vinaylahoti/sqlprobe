@@ -2,13 +2,13 @@
   description: "Revenue queries should use recognized_at not created_at"
   trigger:
     sql_references_any:
-      - "amount"
+      - "created_at"
       - "net_revenue"
       - "recognized_revenue"
     question_contains_any:
       - "revenue"
       - "recognized"
   assert:
-    sql_excludes_column: "amount"
+    sql_excludes_column: "created_at"
   severity: warning
   failure_mode: COLUMN_SUBSTITUTION

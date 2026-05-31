@@ -45,6 +45,8 @@ def test_run_with_bad_revenue_sql_outputs_fail():
     assert "FAIL  revenue_q1_enterprise" in result.output
     assert "MISSING_BUSINESS_FILTER" in result.output
     assert "COLUMN_SUBSTITUTION" in result.output
+    assert "Assertion: no_amount_for_revenue" in result.output
+    assert "Assertion: no_created_at_for_revenue" not in result.output
 
 
 def test_json_report_generated(tmp_path):

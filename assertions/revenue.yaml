@@ -28,3 +28,16 @@
     no_select_star: true
   severity: warning
   failure_mode: COLUMN_SUBSTITUTION
+
+- id: no_amount_for_revenue
+  description: "Recognized revenue queries should use net_revenue not amount"
+  trigger:
+    sql_references_any:
+      - "amount"
+    question_contains_any:
+      - "revenue"
+      - "recognized"
+  assert:
+    sql_excludes_column: "amount"
+  severity: warning
+  failure_mode: COLUMN_SUBSTITUTION

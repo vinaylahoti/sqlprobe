@@ -17,7 +17,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `sqlprobe/core/case.py` — EvaluationCase dataclass with full field schema
 - `sqlprobe/core/result.py` — EvaluationResult, LayerResult, AssertionFailure dataclasses
 - case_loader and assertion_loader implemented
-- Built-in assertion library created (4 assertions across 3 files)
+- Built-in assertion library created (5 assertions across 3 files)
 - Two example evaluation cases created
 - syntax evaluator implemented using sqlglot
 - structural assertion engine implemented
@@ -31,5 +31,6 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - run command implemented
 - demo command implemented
 - JSON report support added
+- Corrected revenue assertion attribution for gross amount vs created_at failures
 
 ---

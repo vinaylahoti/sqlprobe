@@ -212,5 +212,29 @@ def test_revenue_demo_sql_fails_with_real_files():
     )
 
     failure_modes = {failure.failure_mode for failure in result.failures}
+    assertion_ids = {failure.assertion_id for failure in result.failures}
     assert FailureMode.MISSING_BUSINESS_FILTER in failure_modes
     assert FailureMode.COLUMN_SUBSTITUTION in failure_modes
+    assert "no_amount_for_revenue" in assertion_ids
+    assert "no_created_at_for_revenue" not in assertion_ids
+
+
+def test_created_at_revenue_assertion_fails_only_for_created_at():
+    assertions = load_assertions_from_dir(Path("assertions"))
+    cases = {case.id: case for case in load_cases_from_dir(Path("cases/examples"))}
+    case = cases["revenue_q1_enterprise"]
+
+    result = evaluate_assertions(
+        case=case,
+        sql=(
+            "SELECT SUM(t.net_revenue) "
+            "FROM transactions t "
+            "JOIN accounts a ON t.account_id = a.id "
+            "WHERE a.is_test = false "
+            "AND t.created_at >= '2024-01-01'"
+        ),
+        assertion_registry=assertions,
+    )
+
+    assertion_ids = {failure.assertion_id for failure in result.failures}
+    assert "no_created_at_for_revenue" in assertion_ids
