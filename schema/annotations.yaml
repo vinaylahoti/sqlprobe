@@ -1,0 +1,24 @@
+annotations:
+  - object: "transactions.amount"
+    semantic: "Gross transaction value before refunds. Do NOT use for revenue reporting."
+    do_not_use_for:
+      - "revenue reporting"
+      - "ARR"
+      - "MRR"
+
+  - object: "transactions.net_revenue"
+    semantic: "Recognized revenue net of refunds and discounts. Use for all financial reporting."
+    preferred_for:
+      - "revenue reporting"
+      - "P&L analysis"
+
+  - object: "accounts.is_test"
+    semantic: "Marks test/demo accounts for internal use only. Must always be filtered: is_test = false."
+    required_filter: "= false"
+
+  - object: "accounts.segment"
+    semantic: "Customer segment. Enterprise customers have segment IN ('ENT', 'ENTERPRISE')."
+
+  - join: "transactions → accounts"
+    on: "transactions.account_id = accounts.id"
+    notes: "Always inner join. No orphaned transactions exist."

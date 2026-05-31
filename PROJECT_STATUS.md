@@ -32,6 +32,10 @@
 - [x] DimensionResult and JudgeResult added to core/result.py
 - [x] compute_overall_score and compute_overall_verdict helpers added
 - [x] anthropic added to judge extra and dev dependencies
+- [x] SchemaAnnotation dataclass and load_annotations() implemented
+- [x] build_annotation_context() implemented
+- [x] schema/annotations.yaml created
+- [x] tests/test_annotation_loader.py added and passing
 
 ---
 
